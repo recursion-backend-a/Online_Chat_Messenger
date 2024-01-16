@@ -12,14 +12,15 @@ sock.bind((address, port))
 header = "" 
 try:
     print("sending {!r}".format(b"Message to send to the client."))
-    sock.sendto(b"Message to send to the client.", (server_address, server_port))
-    username = input("Type in your name")
+    # sock.sendto(b"Message to send to the client.", (server_address, server_port))
+    username = input("Type in your name\n")
     username_len = len(username).to_bytes(1, "big")
-    message = input("Type in your message")
+    message = input("Type in your message\n")
+
+    all_message = username_len + username.encode() + message.encode()
+    sock.sendto(all_message, (server_address, server_port))
+    print("sending all_messages")
     #after making format, send the message
-    sock.sendto(username_len, (server_address, server_port))
-    sock.sendto(username.encode(), (server_address, server_port))
-    sock.sendto(message.encode(), (server_address, server_port))
 
 
 finally:

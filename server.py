@@ -12,18 +12,17 @@ sock.bind((server_address, server_port))
 while True:
     print("\n waiting to receive message")
     message_all = ""
-    username_len, client_address = sock.recvform(1)
-    username_b = sock.recv(username_len)
-    username = username_b.decode("utf-8")
+    data, client_address = sock.recvfrom(4096)
     user_set.add(client_address)
-    while True:
-        message = socket.recv(4096)
-        message_all += message
-        if not message:
-            message_all = message_all.decode("utf-8")
-            break
-    print(message_all)
+    print(data[0])
+    username_len = data[0]
+    username = data[1:username_len + 1].decode("utf-8")
+    message = data[username_len + 1:].decode("utf-8")
+    print("username", username)
+    print("message:", message)
+
     if message:
         for user in user_set:
             sock.sendto(message_all.encode(), client_address)
+            print("sending the message to {}".format(user))
 
