@@ -9,7 +9,8 @@ address = ""
 port = 9050
 
 sock.bind((address, port))
-header = "" 
+
+
 try:
     # sock.sendto(b"Message to send to the client.", (server_address, server_port))
     username = input("Type in your name\n")
