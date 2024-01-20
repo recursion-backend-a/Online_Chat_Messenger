@@ -3,7 +3,6 @@ import os
 import time
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
 server_address = "127.0.0.1"
 server_port = 9001
 server_address_port = (server_address, server_port)
@@ -11,13 +10,17 @@ address = ""
 port = 9050
 sock.bind((address, port))
 
-pid = os.fork()
-if pid > 0:
-    username = input("Type in your name\n")
-    username_len = len(username).to_bytes(1, "big")
+pid2 = os.fork()
+if pid2 > 0:
+    room_name = input("Type in the room name.\n")
+    room_name_len = len(room_name).to_bytes(1, "big")
+    token = socket.gethostbyname(socket.gethostname())
+    token_len = len(token).to_bytes(1, "big")
+    user_name = input("Type in your name\n")
+    user_name_len = len(user_name).to_bytes(1, "big")
     while True:
         message = input("Type in your message\n")
-        all_message = username_len + username.encode() + message.encode()
+        all_message = room_name_len + token_len + room_name.encode() + token.encode() + message.encode()
         sock.sendto(all_message, server_address_port)
         print("sending messages")
         time.sleep(1)
