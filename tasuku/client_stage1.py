@@ -22,7 +22,7 @@ try:
         print("sending messages")
         #after making format, send the message
         data, server_address_port = sock.recvfrom(4096)
-        print(data.decode())
+        print("receiving", data.decode())
 
         will_continue = input("Do you continue?\t Y or N\n")
         if will_continue == 'n' or will_continue == 'N':
