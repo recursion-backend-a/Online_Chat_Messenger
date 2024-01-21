@@ -41,17 +41,24 @@ while True:
             sock.send(server_message)
 
         elif operation == 2: #操作コードが２のとき
-            group_hash[room_name].append((client_address, user_name, ""))
-            # クライアントに応答
-            server_message = "The state is 1. Joining" + room_name
-            header = protocol_header( room_name, operation, 1, server_message)
-            sock.send(header)
-            sock.send(server_message)
-            # クライアントにルーム作成の完了を伝える
-            server_message = "The state is 2. Joined" + room_name
-            header = protocol_header( room_name, operation, 2, server_message)
-            sock.send(header)
-            sock.send(server_message)
+            if room_name not in group_hash.keys():
+                server_message = "This room does not exist."
+                print(server_message)
+                header = protocol_header(room_name, operation, 0, server_message)
+                sock.send(header)
+                sock.send(server_message)
+            else:
+                group_hash[room_name].append((client_address, user_name, ""))
+                # クライアントに応答
+                server_message = "The state is 1. Joining" + room_name
+                header = protocol_header( room_name, operation, 1, server_message)
+                sock.send(header)
+                sock.send(server_message)
+                # クライアントにルーム作成の完了を伝える
+                server_message = "The state is 2. Joined" + room_name
+                header = protocol_header( room_name, operation, 2, server_message)
+                sock.send(header)
+                sock.send(server_message)
 
 
 
