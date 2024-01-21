@@ -16,26 +16,32 @@ except socket.error as err:
     sys.exit(1)
 
 try:
-    operation = input("1 : Create a room  2: Join a room")
-    room_name = input("Tyoe in athe room name.")
-    user_name = input("Type in your name")
-    header = protocol_header(room_name, operation, 0, user_name)
-    sock.send(header)
-    sock.send(user_name)
-    # サーバーからのレスポンスを受信
-    header = sock.recv(32)
-    room_name_len = int.from_bytes(header[0], "big")
-    payload_len = int.from_bytes(header[3:32], "big")
-    sock.recv(room_name_len)
-    server_response = sock.recv(payload_len).decode("utf-8")
-    print(server_response)
-    # サーバーから完了のメッセージを受信
-    header = sock.recv(32)
-    room_name_len = int.from_bytes(header[0], "big")
-    payload_len = int.from_bytes(header[3:32], "big")
-    sock.recv(room_name_len)
-    server_response = sock.recv(payload_len).decode("utf-8")
-    print(server_response)
+    flag = 0
+    while flag:
+        operation = input("1 : Create a room  2: Join a room")
+        room_name = input("Tyoe in athe room name.")
+        user_name = input("Type in your name")
+        header = protocol_header(room_name, operation, 0, user_name)
+        sock.send(header)
+        sock.send(user_name)
+        # サーバーからのレスポンスを受信
+        header = sock.recv(32)
+        room_name_len = int.from_bytes(header[0], "big")
+        payload_len = int.from_bytes(header[3:32], "big")
+        sock.recv(room_name_len)
+        server_response = sock.recv(payload_len).decode("utf-8")
+        print(server_response)
+        if server_response == "This room does not exist.":
+            fleg = 0
+        # サーバーから完了のメッセージを受信
+        elif server_address == "The state is 1. Joining" + room_name:
+            header = sock.recv(32)
+            room_name_len = int.from_bytes(header[0], "big")
+            payload_len = int.from_bytes(header[3:32], "big")
+            sock.recv(room_name_len)
+            server_response = sock.recv(payload_len).decode("utf-8")
+            print(server_response)
+            flag = 1
 
 finally:
     print("closing socket")
