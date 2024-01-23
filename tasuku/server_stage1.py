@@ -33,11 +33,11 @@ while True:
     now = time.time()
     time_hash[username] = now
     # しばらく通信していない相手をuser_address_setから削除
-    for user_name in time_hash:
+    for user_name in time_hash.keys():
         if time_hash[user_name] - now  > 10000:
             user_address_set.remove(name_hash[user_name])
-    
-    # メッセージをグループない全員に送信
+    # メッセージをグループ内全員に送信
+            
     if message:
         for user_address in user_address_set:
             sock.sendto(message.encode(), user_address)
