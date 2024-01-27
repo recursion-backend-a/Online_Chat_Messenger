@@ -1,9 +1,11 @@
+# socketとosモジュールをインポート
 import socket
 import os
 
 def protocol_header(room_name_len, operation, state, payload_len):
     return room_name_len.to_bytes(1, "big") + int(operation).to_bytes(1, "big") + state.to_bytes(1, "big") + payload_len.to_bytes(29, "big")
 
+#ソケットを作成し、アドレスとポートを作成
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_address = ''
 server_port = 9002
@@ -16,8 +18,10 @@ while True:
     print("waiting for connections.")
     connection, client_address = sock.accept()
     # try:
-    print("connection from", client_address)
+    print("connection from", client_address)  #ここまでは通っている
+    
     header = connection.recv(32)
+    print(header) #テスト用に追加、ここまで通っている
     room_name_len = int.from_bytes(header[:1], "big")  #ちなみにroom_name_len = header[0]という書き方もできる
     operation = int.from_bytes(header[1:2], "big")
     state = int.from_bytes(header[2:3], "big")
