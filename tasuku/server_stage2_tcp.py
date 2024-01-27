@@ -29,7 +29,7 @@ while True:
     state = int.from_bytes(header[2:3], "big")
     print(state)
     payload_len = int.from_bytes(header[3:32], "big")
-    print(state)
+    print(payload_len)
     room_name = connection.recv(room_name_len).decode("utf-8")
     print(room_name)
     user_name = connection.recv(payload_len).decode("utf-8")
@@ -45,9 +45,11 @@ while True:
         header = protocol_header( len(room_name.encode()), operation, 1, len(server_message.encode()))
         connection.send(header)
         connection.send(server_message.encode("utf-8"))
+        #上のコード、ズレてる。The stateのはずがstateとなってる
         # クライアントにルーム作成の完了を伝える
-        server_message = "The state is 2. Finished making a new room."
-        header = protocol_header( len(room_name.encode()), operation, 2, len(server_message.encode()))
+        server_message = "The state is 2. Finished making a new room." + '\n' + "Your token is\n" + str(client_address[0])
+        header = protocol_header(len(room_name.encode()), operation, 2, len(server_message.encode()))
+        print(header) #テスト
         connection.send(header)
         connection.send(server_message.encode("utf-8"))
 
@@ -66,7 +68,7 @@ while True:
             connection.send(header)
             connection.send(server_message.encode("utf-8"))
             # クライアントにルーム参加の完了を伝える
-            server_message = "The state is 2. Joined" + room_name + '\n' + "Your token is\n" + client_address
+            server_message = "The state is 2. Joined" + room_name + '\n' + "Your token is\n" + str(client_address[0])
             header = protocol_header(len(room_name.encode()), operation, 2, len(server_message.encode()))
             connection.send(header)
             connection.send(server_message.encode("utf-8"))
