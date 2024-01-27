@@ -24,7 +24,7 @@ while flag:
     room_name = input("Type in the room name.\n")
     user_name = input("Type in your name\n")
     header = protocol_header(len(room_name.encode()), operation, 0, len(user_name.encode()))
-    print(header) #テストのために、岡川追加、ここまで通っていること確認
+    print(header) #テストのために、岡川追加。何かが入っていることは確認したが、正しいかはわからない。
     #この時点でheaderに32バイトの情報が入っていて、そっから抽出
     sock.send(header)
     #sock.send(header + user_name.encode("utf-8"))

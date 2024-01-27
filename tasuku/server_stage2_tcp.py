@@ -23,11 +23,17 @@ while True:
     header = connection.recv(32)
     print(header) #テスト用に追加、ここまで通っている
     room_name_len = int.from_bytes(header[:1], "big")  #ちなみにroom_name_len = header[0]という書き方もできる
+    print(room_name_len)
     operation = int.from_bytes(header[1:2], "big")
+    print(operation)
     state = int.from_bytes(header[2:3], "big")
+    print(state)
     payload_len = int.from_bytes(header[3:32], "big")
+    print(state)
     room_name = connection.recv(room_name_len).decode("utf-8")
+    print(room_name)
     user_name = connection.recv(payload_len).decode("utf-8")
+    print(user_name)
     print(room_name_len, operation, state, payload_len, room_name, user_name)
 
     if operation == 1: #操作コードが１のとき(ルーム作成のとき)
