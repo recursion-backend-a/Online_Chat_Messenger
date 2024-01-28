@@ -4,8 +4,8 @@ import socket
 
 # user_address_set = set() #ユーザーの集合、グループ内に存在するユーザーを保持
 # ステージ２では上のコードを
-#　group = {}　キー：グループネーム　値：ユーザーのリスト、　のハッシュマップ
-#  group[A] = [username1, username2, ....]とかにするべきか 
+#　group_hash = {}　キー：ルームネーム　値：ユーザーのリスト、　のハッシュマップ
+#  group_hash[A] = [ipaddress1, ipaddress2, ....]とかにするべきか 
 
 group_hash = {}
 
@@ -32,12 +32,12 @@ while True:
     print("meesage", message)
     print("client address", client_address)
 
-
-    if token not in group_hash.keys():
+    if token not in group_hash[room_name]:
         print("This message is from an unknown user.")
         continue
 
     #以下の処理はルーム作成のときにすべき。グループのハッシュマップにユーザーを登録
+    ##追記：すでにTCPに実装済みのため反映不要
     # if room_name not in group_hash.keys():
     #     group_hash[room_name] = []
     # group_hash[room_name].append(client_address)
