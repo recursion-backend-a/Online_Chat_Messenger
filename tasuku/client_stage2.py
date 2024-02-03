@@ -26,7 +26,6 @@ try:
         room_name = input("Type in the room name.\n")
         user_name = input("Type in your name\n")
         header = protocol_header(len(room_name.encode()), operation, 0, len(user_name.encode()))
-        print(header) #テストのために、岡川追加。何かが入っていることは確認したが、正しいかはわからない。
         sock.send(header)
         sock.send(room_name.encode("utf-8"))
         sock.send(user_name.encode("utf-8"))
@@ -75,7 +74,7 @@ if pid2 > 0:
     while True:
         message = input("Type in your message\n")
         all_message = room_name_len + token_len + room_name.encode() + token.encode() + message.encode()
-        udp_sock.sendto(all_message, server_address_port)
+        udp_sock.sendto(all_message, server_address_port) ##ここが通っているか怪しい
         print("sending messages")
         time.sleep(1)
 else:

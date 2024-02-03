@@ -22,7 +22,6 @@ if pid > 0:
         connection, client_address = sock.accept()
         try:
             print("connection from", client_address) 
-            
             header = connection.recv(32)
             room_name_len = int.from_bytes(header[:1], "big")  #ちなみにroom_name_len = header[0]という書き方もできる
             operation = int.from_bytes(header[1:2], "big")
@@ -31,7 +30,6 @@ if pid > 0:
             room_name = connection.recv(room_name_len).decode("utf-8")
             user_name = connection.recv(payload_len).decode("utf-8")
             print(room_name_len, operation, state, payload_len, room_name, user_name)
-
             if operation == 1: #操作コードが１のとき(ルーム作成のとき)
                 if room_name not in group_hash.keys():
                     group_hash[room_name] = []
@@ -44,7 +42,6 @@ if pid > 0:
                 # クライアントにルーム作成の完了を伝える
                 server_message = "The state is 2. Finished making a new room." + '\n' + "Your token is\n" + str(client_address[0])
                 header = protocol_header(len(room_name.encode()), operation, 2, len(server_message.encode()))
-                print(header) #テスト
                 connection.send(header)
                 connection.send(server_message.encode("utf-8"))
 
@@ -91,16 +88,12 @@ else:
     while True:
         print("\n waiting to receive message")
         data, client_address = sock.recvfrom(4096)
-        print("room_name_size", data[0])
+        print("room_name_size", data[0]) 
         room_name_len = data[0]
         token_len = data[1]
         room_name = data[2 : 2 + room_name_len].decode("utf-8")
         token = data[2 + room_name_len: 2 + room_name_len + token_len].decode("utf-8")
         message = data[2 + room_name_len + token_len:].decode("utf-8")
-        print("token", token, type(token))
-        print("meesage", message)
-        print("client address", client_address)
-    
         if token not in group_hash[room_name]:
             print("This message is from an unknown user.")
             continue
