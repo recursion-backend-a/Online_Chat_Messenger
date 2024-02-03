@@ -9,7 +9,7 @@ def protocol_header(room_name_len, operation, state, payload_len):
 #ソケットを作成
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 #入力されたアドレスのサーバーに接続。ポートは指定しておく
-server_address = input("Tyoe in the server's address to connect to : ")
+server_address = input("Type in the server's address to connect to : ")
 server_port = 9002
 
 try:
@@ -26,10 +26,6 @@ try:
         room_name = input("Type in the room name.\n")
         user_name = input("Type in your name\n")
         header = protocol_header(len(room_name.encode()), operation, 0, len(user_name.encode()))
-        print(header) #テストのために、岡川追加。何かが入っていることは確認したが、正しいかはわからない。
-        #この時点でheaderに32バイトの情報が入っていて、そっから抽出
-        #sock.send(header)
-        #sock.send(header + user_name.encode("utf-8"))
         sock.send(header)
         sock.send(room_name.encode("utf-8"))
         sock.send(user_name.encode("utf-8"))
@@ -41,7 +37,7 @@ try:
         server_response = sock.recv(payload_len).decode("utf-8")
         print(server_response)
         if state == 0: #stateが0のままのときはリクエストが失敗（とサーバー側で決める。）
-            flag = 0
+            flag = 1
         elif state == 1: #ｓstateが1であればリクエストが成功‥
             header = sock.recv(32)
             #room_name_len = header[0]
@@ -64,22 +60,21 @@ udp_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 # server_address = "127.0.0.1"
 server_port = 9001
 server_address_port = (server_address, server_port)
-address = ""
-port = 9050
-udp_sock.bind((address, port))
 
 pid2 = os.fork()
 if pid2 > 0:
     room_name = input("Type in the room name.\n")
     room_name_len = len(room_name).to_bytes(1, "big")
-    token = socket.gethostbyname(socket.gethostname())
+    token = socket.gethostname()
+    #token = socket.gethostbyname(socket.gethostname())
+    print(token)
     token_len = len(token).to_bytes(1, "big")
     user_name = input("Type in your name\n")
     user_name_len = len(user_name).to_bytes(1, "big")
     while True:
         message = input("Type in your message\n")
         all_message = room_name_len + token_len + room_name.encode() + token.encode() + message.encode()
-        udp_sock.sendto(all_message, server_address_port)
+        udp_sock.sendto(all_message, server_address_port) ##ここが通っているか怪しい
         print("sending messages")
         time.sleep(1)
 else:
