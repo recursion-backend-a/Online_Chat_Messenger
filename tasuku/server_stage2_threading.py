@@ -1,15 +1,14 @@
 import os 
 import socket
+import threading
 import time
 
 def protocol_header(room_name_len, operation, state, payload_len):
     return room_name_len.to_bytes(1, "big") + int(operation).to_bytes(1, "big") + state.to_bytes(1, "big") + payload_len.to_bytes(29, "big")
 
-pid = os.fork()
 group_hash = {}
 
-if pid > 0:
-    #ソケットを作成し、アドレスとポートを作成
+def tcp_communication():
     tcp_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_address = ''
     server_port = 9002
@@ -33,6 +32,7 @@ if pid > 0:
             print(room_name_len, operation, state, payload_len, room_name, user_name)
 
             if operation == 1: #操作コードが１のとき(ルーム作成のとき)
+                global group_hash
                 if room_name not in group_hash.keys():
                     group_hash[room_name] = []
                 group_hash[room_name].append((client_address, user_name, "host"))
@@ -73,7 +73,7 @@ if pid > 0:
             print("Closing current connection")
             connection.close()
 
-else:
+def udp_communication():
     udp_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     server_address = ""
     server_port = 9001
@@ -93,6 +93,7 @@ else:
         print("token", token, type(token))
         print("meesage", message)
         print("client address", client_address)
+        print("room_name", room_name)
         print("group_hash[room_name] : ", group_hash[room_name])
         
 
@@ -108,7 +109,17 @@ else:
         #         group_hash[room_name].remove(user_token)
 
         #メッセージをグループ内全員に送信            
-        # if message:
-        #     for user_token in group_hash[room_name]:
-        #         udp_sock.sendto(message.encode(), (user_token[0], user_token[1]))
-        #         print("sending the message to {}".format((user_token[0], user_token[1])))
+        if message:
+            for user_token in group_hash[room_name]:
+                udp_sock.sendto(message.encode(), user_token[0])
+                print("sending the message to {}".format(user_token[0]))
+
+
+thread1 = threading.Thread(target=tcp_communication)
+thread2 = threading.Thread(target=udp_communication)
+
+thread1.start()
+thread2.start()
+
+thread1.join()
+thread2.join()

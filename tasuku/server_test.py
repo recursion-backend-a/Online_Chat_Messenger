@@ -43,8 +43,8 @@ while True:
             
     if message:
         for user_address in user_address_set:
-            sock.sendto(message.encode(), user_address)
-            print("sending the message to {}".format(user_address))
+            sock.sendto(message.encode(), (user_address[0], user_address[1]))
+            print("sending the message to {}".format((user_address[0], user_address[1])))
 
 
 

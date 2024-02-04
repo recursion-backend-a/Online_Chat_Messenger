@@ -17,43 +17,39 @@ except socket.error as err:
     print(err)
     sys.exit(1)
 
-# try:
-flag = 1
-while flag:
-    operation = input("1 : Create a room  2: Join a room\n")
-    room_name = input("Type in the room name.\n")
-    user_name = input("Type in your name\n")
-    header = protocol_header(len(room_name.encode()), operation, 0, len(user_name.encode()))
-    print(header) #テストのために、岡川追加。何かが入っていることは確認したが、正しいかはわからない。
-    #この時点でheaderに32バイトの情報が入っていて、そっから抽出
-    #sock.send(header)
-    #sock.send(header + user_name.encode("utf-8"))
-    sock.send(header)
-    sock.send(room_name.encode("utf-8"))
-    sock.send(user_name.encode("utf-8"))
-    # サーバーからのレスポンスを受信
-    header = sock.recv(32)
-    room_name_len = header[0] #ちなみにheader[:1]という書き方をするとroom_name_len = int.from_bytes(header[:1], "big")と書かないと駄目
-    state = header[2]
-    payload_len = int.from_bytes(header[3:32], "big")
-    server_response = sock.recv(payload_len).decode("utf-8")
-    print(server_response)
-    if state == 0: #stateが0のままのときはリクエストが失敗（とサーバー側で決める。）
-        flag = 0
-    elif state == 1: #ｓstateが1であればリクエストが成功‥
+try:
+    flag = 1
+    while flag:
+        operation = input("1 : Create a room  2: Join a room\n")
+        room_name = input("Type in the room name.\n")
+        user_name = input("Type in your name\n")
+        header = protocol_header(len(room_name.encode()), operation, 0, len(user_name.encode()))
+        sock.send(header)
+        sock.send(room_name.encode("utf-8"))
+        sock.send(user_name.encode("utf-8"))
+        # サーバーからのレスポンスを受信
         header = sock.recv(32)
-        #room_name_len = header[0]
+        room_name_len = header[0] #ちなみにheader[:1]という書き方をするとroom_name_len = int.from_bytes(header[:1], "big")と書かないと駄目
         state = header[2]
         payload_len = int.from_bytes(header[3:32], "big")
         server_response = sock.recv(payload_len).decode("utf-8")
         print(server_response)
-        flag = 0
-        # サーバーから完了のメッセージを受信
-        if state == 2:
-            token = server_response.split('\n')[2] #tokenは３行目にあるので、配列の添字は2
-            print(token)
-# finally:
-#     print("closing socket")
-#     sock.close()
+        if state == 0: #stateが0のままのときはリクエストが失敗（とサーバー側で決める。）
+            flag = 1
+        elif state == 1: #ｓstateが1であればリクエストが成功‥
+            header = sock.recv(32)
+            #room_name_len = header[0]
+            state = header[2]
+            payload_len = int.from_bytes(header[3:32], "big")
+            server_response = sock.recv(payload_len).decode("utf-8")
+            print(server_response)
+            flag = 0
+            # サーバーから完了のメッセージを受信
+            if state == 2:
+                token = server_response.split('\n')[2] #tokenは３行目にあるので、配列の添字は2
+                print(token)
+finally:
+    print("closing socket")
+    sock.close()
 
 # 以降UDP通信が始まる
